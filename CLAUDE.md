@@ -31,6 +31,11 @@ videregående skole in Bergen, Norway. Rebuilt from a static HTML site.
 - Scroll animations: add `data-reveal` to an element. `components/reveal.tsx`
   handles it, respects `prefers-reduced-motion`, and reveals above-the-fold
   content synchronously. Content must stay readable if JS never runs.
+- **`RevealScript` must stay keyed on `usePathname()`.** It lives in the root
+  layout, which does not remount during client-side navigation. With a bare
+  `[]` dependency it runs only once, and every page reached by clicking a link
+  renders blank below the hero until a hard refresh. This shipped once — if you
+  touch that effect, re-check it by clicking (not reloading) into each page.
 - Site language is **Norwegian (bokmål)**. URLs stay English (`/menu`, `/hours`)
   because they are already indexed — do not rename routes.
 - Icons are SVG in `components/icons.tsx`. No emoji as icons.

@@ -1,16 +1,23 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 /**
  * Reveals [data-reveal] elements on scroll.
  *
- * Anything already at or above the fold is revealed synchronously on mount —
- * relying on IntersectionObserver alone can leave above-the-fold content stuck
- * at opacity 0 if the first callback batch is throttled. Without JS the CSS
- * leaves everything visible, so content never depends on this running.
+ * Keyed on the pathname: this lives in the root layout, which does NOT
+ * remount during client-side navigation. Running only on mount would leave
+ * every page after the first stuck at opacity 0 until a hard refresh.
+ *
+ * Anything already at or above the fold is revealed synchronously, because
+ * relying on IntersectionObserver alone can leave above-the-fold content
+ * hidden if the first callback batch is throttled. Without JS the CSS leaves
+ * everything visible, so content never depends on this running.
  */
 export function RevealScript() {
+  const pathname = usePathname();
+
   useEffect(() => {
     const root = document.documentElement;
     root.classList.add("js");
@@ -25,6 +32,7 @@ export function RevealScript() {
     }
 
     const pending = nodes.filter((node) => {
+      if (node.classList.contains("is-visible")) return false;
       // Already in view (or scrolled past): show it now, don't wait on the observer.
       if (node.getBoundingClientRect().top < window.innerHeight) {
         show(node);
@@ -48,7 +56,7 @@ export function RevealScript() {
 
     pending.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
   return null;
 }
