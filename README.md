@@ -54,8 +54,8 @@ npx vercel --prod # production
 
 ## Notes
 
-- `legacy/` holds the original static HTML site for reference. It is excluded
-  from the TypeScript build and is not deployed.
+- The original static HTML site is not in the working tree; it is preserved in
+  git history at commit `6cafbf4` if you ever need to look something up.
 - Old `.html` URLs (`/menu.html` etc.) 308-redirect to their new paths, so
   existing inbound links keep working.
 - `robots.txt` and `sitemap.xml` are generated at build time from `lib/content.ts`.

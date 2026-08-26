@@ -126,6 +126,30 @@ export const milks = [
   "Soyamelk",
 ];
 
+/* --------------------------------- Perks ---------------------------------- */
+
+/**
+ * Things a guest saves money on. These were only mentioned in the FAQ before,
+ * so nobody reading the menu ever learned they existed.
+ */
+export const perks: { icon: "card" | "cup" | "milk"; title: string; text: string }[] = [
+  {
+    icon: "card",
+    title: "Klippekort",
+    text: "Kjøp klippekort og få i praksis 10 eller 20 kr gratis. Spør i baren.",
+  },
+  {
+    icon: "cup",
+    title: "Egen kopp, bedre pris",
+    text: "Tar du med din egen kopp, får du kaffen til redusert pris.",
+  },
+  {
+    icon: "milk",
+    title: "Alltid samme pris på melk",
+    text: "Havre, mandel, soya og laktosefri koster ikke ekstra.",
+  },
+];
+
 /* --------------------------------- Hours ---------------------------------- */
 
 export type OpeningDay = {
@@ -240,3 +264,63 @@ export const formatDate = (iso: string) =>
     month: "long",
     year: "numeric",
   }).format(new Date(iso));
+
+/* ------------------------------- Open state ------------------------------- */
+
+export type OpenState =
+  | { isOpen: true; closesAt: string }
+  | { isOpen: false; nextDay: string; nextOpensAt: string };
+
+const MINUTES_PER_HOUR = 60;
+const toMinutes = (hhmm: string) => {
+  const [h, m] = hhmm.split(":").map(Number);
+  return h * MINUTES_PER_HOUR + m;
+};
+
+/**
+ * Whether the bar is open right now, evaluated in the cafe's own timezone
+ * (Europe/Oslo) rather than the visitor's.
+ */
+export function getOpenState(now: Date = new Date()): OpenState {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Oslo",
+    weekday: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(now);
+
+  const part = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  const weekday = part("weekday");
+  const nowMinutes = toMinutes(`${part("hour")}:${part("minute")}`);
+
+  const todayIndex = openingHours.findIndex((d) => d.schema === weekday);
+  const today = todayIndex >= 0 ? openingHours[todayIndex] : undefined;
+
+  if (today?.opens && today.closes) {
+    const open = toMinutes(today.opens);
+    const close = toMinutes(today.closes);
+    if (nowMinutes >= open && nowMinutes < close) {
+      return { isOpen: true, closesAt: today.closes };
+    }
+    // Earlier the same day still counts as opening today.
+    if (nowMinutes < open) {
+      return { isOpen: false, nextDay: "i dag", nextOpensAt: today.opens };
+    }
+  }
+
+  // Walk forward to the next day that has hours.
+  const start = todayIndex >= 0 ? todayIndex : 0;
+  for (let step = 1; step <= openingHours.length; step += 1) {
+    const day = openingHours[(start + step) % openingHours.length];
+    if (day.opens) {
+      return {
+        isOpen: false,
+        nextDay: step === 1 ? "i morgen" : day.day.toLowerCase(),
+        nextOpensAt: day.opens,
+      };
+    }
+  }
+
+  return { isOpen: false, nextDay: "mandag", nextOpensAt: "09:00" };
+}

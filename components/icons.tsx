@@ -75,6 +75,13 @@ export const UsersIcon = ({ className }: IconProps) => (
   </svg>
 );
 
+export const TicketIcon = ({ className }: IconProps) => (
+  <svg {...base} className={className}>
+    <path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 6v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-6Z" />
+    <path d="M13 5v2M13 11v2M13 17v2" />
+  </svg>
+);
+
 export const ArrowRightIcon = ({ className }: IconProps) => (
   <svg {...base} className={className}>
     <path d="M5 12h14M13 6l6 6-6 6" />

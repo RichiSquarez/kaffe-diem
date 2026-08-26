@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClockIcon, PhoneIcon } from "@/components/icons";
+import { OpenStatus } from "@/components/open-status";
 import { Button, PageHero, Section } from "@/components/ui";
 import { openingHours, site } from "@/lib/content";
 import { breadcrumb, JsonLd } from "@/lib/schema";
@@ -26,10 +27,13 @@ export default function HoursPage() {
             data-reveal
             className="overflow-hidden rounded-3xl border border-espresso/10 bg-parchment shadow-card"
           >
-            <h2 className="flex items-center gap-3 border-b border-espresso/10 px-8 py-6 text-xl">
-              <ClockIcon className="h-5 w-5 text-gold-ink" />
-              Ukeplan
-            </h2>
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-espresso/10 px-8 py-6">
+              <h2 className="flex items-center gap-3 text-xl">
+                <ClockIcon className="h-5 w-5 text-gold-ink" />
+                Ukeplan
+              </h2>
+              <OpenStatus tone="light" />
+            </div>
             <ul>
               {openingHours.map((d) => {
                 const closed = !d.opens;

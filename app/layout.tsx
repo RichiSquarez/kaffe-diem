@@ -36,13 +36,11 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `${site.name} | ${site.tagline}`,
     description: site.description,
-    images: [{ url: "/img/logo.png", width: 700, height: 392, alt: site.name }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${site.name} | ${site.tagline}`,
     description: site.description,
-    images: ["/img/logo.png"],
   },
   verification: { google: site.googleVerification },
   icons: { icon: "/favicon.ico" },

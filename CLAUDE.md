@@ -16,8 +16,7 @@ videregående skole in Bergen, Norway. Rebuilt from a static HTML site.
 | `lib/content.ts` | **Single source of truth** — menu, prices, hours, FAQ, news, NAP details |
 | `lib/schema.tsx` | schema.org JSON-LD, derived from `content.ts` |
 | `app/*/page.tsx` | One folder per route (`/menu`, `/hours`, …) |
-| `components/` | `site-header`, `site-footer`, `hero`, `ui` (Section/Button/PageHero), `icons` |
-| `legacy/` | The original static HTML site, kept for reference. Not built or deployed. |
+| `components/` | `site-header`, `site-footer`, `hero`, `ui` (Section/Button/PageHero), `icons`, `open-status` |
 
 ## Rules that matter here
 
@@ -35,11 +34,18 @@ videregående skole in Bergen, Norway. Rebuilt from a static HTML site.
 - Site language is **Norwegian (bokmål)**. URLs stay English (`/menu`, `/hours`)
   because they are already indexed — do not rename routes.
 - Icons are SVG in `components/icons.tsx`. No emoji as icons.
+- **Anything time-dependent must be a client component.** Pages are statically
+  prerendered, so computing "are we open?" on the server bakes in the build time.
+  See `components/open-status.tsx`; `getOpenState` evaluates in Europe/Oslo, not
+  the visitor's timezone, and is covered by `lib/open-state.test.mts`.
+- The menu quick-nav links to section ids. If you add or rename a section,
+  update both — a dead `#anchor` scrolls nowhere and is easy to miss.
 
 ## Commands
 
 ```bash
 npm run dev        # local dev
+npm run test       # self-check for getOpenState (node type-stripping, no framework)
 npm run build      # production build (also type-checks)
 npm run typecheck  # types only
 ```

@@ -9,6 +9,7 @@ import {
   PhoneIcon,
   WalletIcon,
 } from "@/components/icons";
+import { OpenStatus } from "@/components/open-status";
 import { Button, Eyebrow, Section, SectionTitle } from "@/components/ui";
 import { addressLine, fromPrice, menuGroups, openingHours, site } from "@/lib/content";
 
@@ -176,10 +177,13 @@ export default function HomePage() {
             </div>
 
             <div className="rounded-3xl border border-crema/15 bg-crema/6 p-7">
-              <h3 className="flex items-center gap-2.5 text-lg text-crema">
-                <ClockIcon className="h-5 w-5 text-gold-soft" />
-                Åpningstider
-              </h3>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h3 className="flex items-center gap-2.5 text-lg text-crema">
+                  <ClockIcon className="h-5 w-5 text-gold-soft" />
+                  Åpningstider
+                </h3>
+                <OpenStatus />
+              </div>
               <ul className="mt-5 space-y-3 text-sm">
                 {today.map((d) => (
                   <li

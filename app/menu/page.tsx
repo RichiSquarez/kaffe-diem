@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { LeafIcon, SparkleIcon } from "@/components/icons";
+import {
+  CoffeeIcon,
+  LeafIcon,
+  PhoneIcon,
+  SparkleIcon,
+  TicketIcon,
+} from "@/components/icons";
 import { Button, Eyebrow, PageHero, Section, SectionTitle } from "@/components/ui";
-import { menuGroups, milks, syrups } from "@/lib/content";
+import { menuGroups, milks, perks, site, syrups } from "@/lib/content";
 import { breadcrumb, JsonLd } from "@/lib/schema";
 
 export const metadata: Metadata = {
@@ -11,6 +17,12 @@ export const metadata: Metadata = {
     "Se hele menyen til Kaffe Diem i Bergen: kaffe, espresso, sesongdrikker, bakverk og snacks. Finn også siruper, melketyper og priser.",
   alternates: { canonical: "/menu" },
 };
+
+const perkIcons = {
+  card: TicketIcon,
+  cup: CoffeeIcon,
+  milk: LeafIcon,
+} as const;
 
 export default function MenuPage() {
   return (
@@ -21,7 +33,29 @@ export default function MenuPage() {
         intro="Kvernet på stedet og trukket til bestilling. Spør oss gjerne om anbefalinger – vi tilpasser styrke, melk og sirup etter smak."
       />
 
-      <Section className="py-20 sm:py-24">
+      <Section className="pt-12 sm:pt-14">
+        <nav aria-label="Hurtignavigasjon" data-reveal>
+          <h2 className="sr-only">Hurtignavigasjon</h2>
+          <ul className="flex flex-wrap gap-2.5">
+            {[
+              ...menuGroups.map((g) => ({ href: `#${g.id}`, label: g.title })),
+              { href: "#options", label: "Sirup og melk" },
+              { href: "#perks", label: "Godt å vite" },
+            ].map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  className="inline-block rounded-full border border-espresso/15 bg-parchment px-4 py-2 text-sm font-medium text-roast transition-colors duration-200 hover:border-espresso/40 hover:text-espresso"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </Section>
+
+      <Section className="py-16 sm:py-20">
         <div className="space-y-20">
           {menuGroups.map((group) => (
             <article
@@ -82,7 +116,7 @@ export default function MenuPage() {
       </Section>
 
       {/* Options */}
-      <Section className="pb-24">
+      <Section id="options" className="pb-24">
         <div data-reveal className="max-w-2xl">
           <Eyebrow>Tilvalg</Eyebrow>
           <SectionTitle>Sirup og melk</SectionTitle>
@@ -119,16 +153,53 @@ export default function MenuPage() {
         </div>
       </Section>
 
+      {/* Perks lived only in the FAQ before, so menu readers never saw them. */}
+      <Section id="perks" className="pb-24">
+        <div data-reveal className="max-w-2xl">
+          <Eyebrow>Godt å vite</Eyebrow>
+          <SectionTitle>Slik betaler du mindre</SectionTitle>
+        </div>
+
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {perks.map((perk, i) => {
+            const PerkIcon = perkIcons[perk.icon];
+            return (
+            <article
+              key={perk.title}
+              data-reveal
+              style={{ "--reveal-delay": `${i * 80}ms` } as React.CSSProperties}
+              className="rounded-3xl border border-espresso/10 bg-parchment p-8 shadow-card"
+            >
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-espresso text-gold-soft">
+                <PerkIcon className="h-5 w-5" />
+              </span>
+              <h3 className="mt-5 text-xl">{perk.title}</h3>
+              <p className="mt-2.5 text-pretty leading-relaxed text-muted">
+                {perk.text}
+              </p>
+            </article>
+            );
+          })}
+        </div>
+      </Section>
+
       <Section className="pb-24">
         <div
           data-reveal
-          className="flex flex-wrap items-center justify-between gap-6 rounded-3xl border border-espresso/10 bg-crema/40 px-8 py-10"
+          className="flex flex-wrap items-center justify-between gap-8 rounded-3xl border border-espresso/10 bg-crema/40 px-8 py-10"
         >
           <div>
             <h2 className="text-2xl">Før du besøker oss</h2>
             <p className="mt-2 text-muted">
               Sjekk åpningstider og finn veien til 3. etasje.
             </p>
+            <a
+              href={`tel:${site.phone}`}
+              className="mt-4 inline-flex items-center gap-2.5 text-sm font-semibold text-roast transition-colors duration-200 hover:text-gold-ink"
+            >
+              <PhoneIcon className="h-4 w-4" />
+              {site.phoneDisplay}
+            </a>
           </div>
           <div className="flex flex-wrap gap-3">
             <Button href="/hours">Åpningstider</Button>
