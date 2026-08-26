@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand: dark-roast espresso + crema, with a warm gold accent. */
+  --color-espresso: #241710;
+  --color-roast: #3c2a21;
+  --color-bark: #5a4133;
+  --color-clay: #785a45;
+  --color-crema: #e8dcc0;
+  --color-paper: #f6f1e6;
+  --color-parchment: #fbf8f1;
+  --color-gold: #d9962a;
+  /* Gold is a background/accent color; it fails contrast as text on
+     light surfaces. Use gold-ink for gold-toned text and icons there. */
+  --color-gold-ink: #945e10;
+  --color-gold-soft: #f0c46a;
+  --color-ink: #241a14;
+  --color-muted: #6b5647;
+
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-card: 0 18px 48px -20px rgb(36 23 16 / 0.35);
+  --shadow-lift: 0 28px 60px -24px rgb(36 23 16 / 0.45);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Sticky header must not cover anchor targets. */
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    color: var(--color-espresso);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--color-gold-soft);
+    color: var(--color-espresso);
+  }
+}
+
+@layer utilities {
+  /* Subtle paper grain — gives the flat palette some atmosphere. */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  }
+
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+}
+
+/* --------------------------------- Motion --------------------------------- */
+
+/* Scroll reveal: hidden state applied only once JS confirms support,
+   so content stays visible if JS never runs. */
+[data-reveal] {
+  opacity: 1;
+}
+
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s var(--ease-out-soft),
+    transform 0.7s var(--ease-out-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes steam-rise {
+  0%   { opacity: 0;   transform: translateY(6px) scaleX(0.85); }
+  30%  { opacity: 0.55; }
+  100% { opacity: 0;   transform: translateY(-38px) scaleX(1.25); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-14px) rotate(2deg); }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes pour {
+  from { stroke-dashoffset: 240; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.animate-steam { animation: steam-rise 3.6s ease-out infinite; }
+.animate-float { animation: float-slow 7s ease-in-out infinite; }
+.animate-marquee { animation: marquee 32s linear infinite; }
+.animate-pour { animation: pour 2.4s var(--ease-out-soft) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .animate-steam,
+  .animate-float,
+  .animate-marquee,
+  .animate-pour {
+    animation: none;
+  }
+
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
